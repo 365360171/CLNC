@@ -1,0 +1,100 @@
+0.2
+    添加max_sessions语法
+    修复httpUDP某些情况下不读取服务器返回的数据
+    修复[H_P]语法无效
+    socks5服务支持账号密码验证
+    tunnel_proxy_header语法支持[M] [U] [url] [H_P] [V] [H]关键字
+    修复ipv6无法接收udp报文
+    优化httpUDP性能(内存消耗会增加)
+    修复dns以及httpUDP的socks5_set_dst失效
+    降低TCP的大量内存消耗
+    修复TCP可能丢失数据的问题
+    负载均衡器优化
+    改进httpUDP代理方式
+
+0.3
+    修改tunnel_proxy socks5_client语法
+    增加httpOverTunnel功能，tunnel代理HTTP支持直接HTTP发送到tcp_listen，而不需要经过iptables或者socks5就可以得到[H]
+    修复tcpAcl匹配来源IP出错
+    添加tcp_option选项，支持TFO(tcp_fastopen)和TDA(tcp_defer_accept)选项，具体用法查看配置说明
+    尽可能减少单独ACK包的发送(fastopen模式下不支持)
+    tcp跟socks5添加keepAlive_s选项，主要用来处理长连接的应用，比如ssh
+
+0.4
+    升级加密算法，数据流特征隐蔽(只兼容CNS)
+    httpDNS支持假的ipv6域名解析，将ipv4映射成ipv6返回
+    添加dnsAcl，支持dns域名分流和查询类型分流
+    tcpAcl添加limit_client_ip语法，可以限制客户端同时连接的IP数目以及每个IP最大TCP连接
+    完善tcpDNS，以前觉得没有必要判断tcpDNS回应中头2字节的长度
+    tun还未完善
+
+0.5
+    修复超时模块导致崩溃
+    修复TCP fd不释放，用久了无网
+    改进加密算法(以后应该不需要再改进了)
+    httpUDP改为单线程处理，以前双线程处理可能还不如单线程
+    监听端口使用SO_REUSEPORT，多进程下性能有所提升
+
+0.6
+    修改启动命令-u为-g，指定运行uid改为指定运行gid(如果出现问题请联系)
+    修复dns在某些情况下崩溃
+    添加fake dns功能，请务必把fake dns的域名作为http/tunnel代理。
+        fake dns优点: 加快响应速度
+        fake dns缺点:
+            1. 当客户端dns经过fake dns而TCP不经过核心的http/tunnel处理时，有可能无网
+            2. 当关闭核心后可能系统还存在dns缓存，可能有短暂的断网
+            3. 当fake dns返回的IP与另一个TCP连接的IP刚好一样时，会出现代理不上的情况
+    添加dns缓存的ttl检查
+    timeout语法的单位从分变为秒(检测频率为10s)
+    稍微减少TCP代理内存的动态申请和释放
+    修正从dns回应中读取IP的代码
+    修复httpUDP发送到服务器出错的时候不清理变量的问题
+    添加tun支持，只能单进程，测试阶段，可能会有问题(感谢家住大海提供lwip的使用方法)
+    httpUDP的tproxy添加ipv6支持
+
+0.7
+    修复超时检测卡死的bug
+    删除httpDNS将ipv4映射成ipv6返回的功能
+    httpDNS添加ipv6和ttl查询功能
+    fake dns改为只使用内网IP段
+    各模块的socks5更加完善
+    添加tls伪装支持
+    socks5 tls tunnel代理会按照语法顺序逐个代理
+
+0.7.1
+    修复epoll_wait()timeout的值与理想中的值不一致
+    修复Host中包含端口的时候，[H_P]语法多出一个端口的bug
+    删除命令行参数-w，只有单进程处理
+    fake dns还未完善
+
+0.8
+    修复tun处理[UDP小包/TCP超时]崩溃的bug
+    修复tun处理TCP可能存在不工作的bug
+    修复tun的TCP设置keepalive与实际不符的bug
+    解析模式destAddr的域名时，增加dns缓存
+    删除dns模块cacheLimit语法
+    dns缓存使用uthash记录, 缓存文件与之前的版本不通用
+    完善dns缓存的ttl
+    fake dns还未完善
+    reMatch语法重新分配tcpAcl的时候, 如果目标地址一样并且没有传输过任何数据则不会重新连接目标地址
+
+0.8.1
+    添加tunMask设置
+    关闭目标地址socket的时候直接发送RST, 减少数据包发送, tun模式下还有更好的兼容性
+
+0.9
+    tun路径默认为/dev/net/tun或者/dev/tun(智能选择)
+    修改dns解析，解析失败也返回Name Error(修复部分模式用久了系统dns不工作)
+    修改dns缓存最少缓存一周
+    优化httpUDP
+
+0.9.1
+    修复dns的socks5无法代理
+
+0.9.2
+    修复UDP的socks5无法代理
+    修复TCPDNS缓存可能导致崩溃
+
+1.0
+    自动获取系统dnsIP，用于初始化配置时解析域名
+    修复httpDNS解析ipv6时崩溃的现象
